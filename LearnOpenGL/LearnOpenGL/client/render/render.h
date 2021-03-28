@@ -82,6 +82,9 @@ Render::Render()
 	glViewport(0, 0, winSizeW, winSizeH);
 	glfwSetFramebufferSizeCallback(win, onSize);
 	glfwSetKeyCallback(win, onEnter);
+
+	glEnable(GL_DEPTH_TEST); // 启用深度缓冲测试
+
 	renderWorld = std::make_shared<RenderWorld>();
 }
 
@@ -121,6 +124,8 @@ void Render::afterRender()
 {
 	glfwPollEvents();
 	glfwSwapBuffers(win);
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // 每帧结束清楚深度缓冲
 }
 
 void Render::draw()
