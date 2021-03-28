@@ -84,6 +84,7 @@ unsigned int vertices1indices[] = {
 		21, 22, 23,
 };
 
+int cubeNum = 10;
 glm::vec3 cubePositions[] = {
   glm::vec3(0.0f,  0.0f,  0.0f),
   glm::vec3(2.0f,  5.0f, -15.0f),
@@ -122,12 +123,18 @@ int main()
 
 	///* shader
 	std::shared_ptr<Shader> shader = std::make_shared<Shader>("../LearnOpenGL/resource/shader/box.vs", "../LearnOpenGL/resource/shader/box.fs");
+	for (int i = 0; i < cubeNum; i++)
+	{
 	std::shared_ptr<RenderObject> ro2 = std::make_shared<RenderObject>(shader);
 	ro2->createEBORenderObject(vertices1, sizeof(vertices1), vertices1indices, sizeof(vertices1indices), 0, 3, false, 8, 0);
 	ro2->attachVertexAttribPointer(1, 3, false, 8, 3);
 	ro2->attachVertexAttribPointer(2, 2, false, 8, 6);
 	ro2->setDrawVerNum(36);
+	glm::mat4 tempMat = glm::mat4(1.0f);
+	tempMat = glm::translate(tempMat, cubePositions[i]);
+	ro2->setExTransformMat(tempMat);
 	render.gerRenderWorld()->regRenderObject(ro2->getName(), ro2);
+	}
 
 	///* texture
 	unsigned int texture[2];
@@ -235,8 +242,6 @@ int main()
 		shader->setMat4("modelMat", modelMat);
 		shader->setMat4("viewMat", viewMat);
 		shader->setMat4("projectionMat", projectionMat);
-
-
 
 		render.draw();
 	}

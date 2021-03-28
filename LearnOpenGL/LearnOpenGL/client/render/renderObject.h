@@ -3,6 +3,10 @@
 
 #include "../shader/shader.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 class RenderObject
 {
 public:
@@ -18,6 +22,14 @@ public:
 	std::string  getName() { return name; };
 	void setDrawVerNum(unsigned int num) { verNum = num; };
 	void setDrawVerOffset(unsigned int offset) { verOffset = offset; };
+	void setExTransformMat(glm::mat4& mat) 
+	{ 
+		exTransformlMat *= mat;
+	};
+	void resetExTransformMat()
+	{
+		exTransformlMat = glm::mat4(1.0f);
+	};
 private:
 
 public:
@@ -31,6 +43,8 @@ private:
 	unsigned int verNum = 0;
 	unsigned int verOffset = 0;
 	std::string name;
+	std::string exTransformMatName = "exTransform";
+	glm::mat4 exTransformlMat = glm::mat4(1.0f);
 };
 
 RenderObject::RenderObject(std::shared_ptr<Shader> _shader)
@@ -52,8 +66,12 @@ RenderObject::~RenderObject()
 
 void RenderObject::draw()
 {
-	if(shader)
+	if (shader)
+	{
 		shader->active();
+		if (!exTransformMatName.empty())
+			shader->setMat4(exTransformMatName, exTransformlMat);
+	}
 	glBindVertexArray(VAO);
 	if(isEBO)
 		glDrawElements(GL_TRIANGLES, verNum, GL_UNSIGNED_INT, 0);
