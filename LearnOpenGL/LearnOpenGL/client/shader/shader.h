@@ -2,8 +2,7 @@
 #define SHADER_H
 
 #include "../../core/include.h"
-#include <fstream>
-#include <sstream>
+#include "../../core/file.h"
 
 class Shader
 {
@@ -28,22 +27,10 @@ private:
 
 Shader::Shader(std::string vsPath, std::string fsPath)
 {
-	std::stringstream vsSStream, fsSStream;
-	std::ifstream vsStream, fsStream;
-	std::string vsCode, fsCode;
-	vsStream.open(vsPath);
-	vsSStream << vsStream.rdbuf();
-	vsStream.close();
-	vsCode = vsSStream.str();
-	Assert(!vsCode.empty(), "dame it !!!!! vs load error !!!!!")
-	fsStream.open(fsPath);
-	fsSStream << fsStream.rdbuf();
-	fsStream.close();
-	fsCode = fsSStream.str();
-	Assert(!fsCode.empty(), "dame it !!!!! fs load error !!!!!");
-
-	const char* vsCodeC = vsCode.c_str();
-	const char* fsCodeC = fsCode.c_str();
+	std::string vs = File::readFileData(vsPath);
+	std::string fs = File::readFileData(fsPath);
+	const char* vsCodeC = vs.c_str();
+	const char* fsCodeC = fs.c_str();
 
 	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vsCodeC, NULL);

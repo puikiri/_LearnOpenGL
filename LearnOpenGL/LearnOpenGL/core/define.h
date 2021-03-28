@@ -11,8 +11,8 @@
 /* method */
 #define Assert(flag, str) if(!flag){ printf(str); assert(false);}
 
-
-
+/* */
+#define STB_IMAGE_IMPLEMENTATION
 
 
 

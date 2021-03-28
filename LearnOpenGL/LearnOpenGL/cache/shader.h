@@ -166,7 +166,7 @@
 //	//// 5.? 如果有不同的顶点数据采用不同的着色器的情况下，那么在Draw前都可以调用这句换shader
 //	//// glUseProgram(shaderProgram);
 //	//// End. Draw and UnBind
-//	//glDrawArrays(GL_TRIANGLES, 0, 6); // 此处的6是画6个点
+//	//glDrawArrays(GL_TRIANGLES, 0, 6); // 此处的6是画6个点,索引从0开始。
 //	//// 6. 如果需要(比如切换顶点数组/顶点BUFF)，那么可以调用这个解绑之后再重新绑定。
 //	///*
 //	//glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -186,7 +186,7 @@
 //	//glVertexAttribPointer(vertexShaderLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 //	//glEnableVertexAttribArray(vertexShaderLocation);
 //	//// End. Draw and UnBind
-//	//glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0); // 此处的9是画9个点
+//	//glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0); // 此处的9是画9个点，最后一个参数是索引数组？一般0即可。
 //	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 //	//glBindBuffer(GL_ARRAY_BUFFER, 0);
 //	//glBindVertexArray(0);

@@ -4,7 +4,7 @@
 #include <functional>
 
 #include "../../core/include.h"
-#include "testSence.h"
+#include "renderWorld.h"
 
 typedef void(*WinSizeCallback)(int, int);
 typedef void(*WinKeyEnterCallback)(int, int, int, int);
@@ -55,6 +55,7 @@ public:
 	inline void DelWinSizeCallBack(const std::string &regId) { winSizeCallBackMap.erase(regId); }
 	inline void DelWinKeyEnterCallBack(const std::string &regId) { winKeyEnterCallbackMap.erase(regId); }
 	void draw();
+	std::shared_ptr<RenderWorld> gerRenderWorld() { return renderWorld; };
 private:
 	GLFWwindow* getWin();
 
@@ -67,7 +68,7 @@ public:
 
 private:
 	GLFWwindow* win;
-	TestSence* ts;
+	std::shared_ptr<RenderWorld> renderWorld;
 };
 
 Render::Render()
@@ -81,14 +82,13 @@ Render::Render()
 	glViewport(0, 0, winSizeW, winSizeH);
 	glfwSetFramebufferSizeCallback(win, onSize);
 	glfwSetKeyCallback(win, onEnter);
-
-	ts = new TestSence();
+	renderWorld = std::make_shared<RenderWorld>();
 }
 
 Render::~Render()
 {
+	renderWorld = nullptr;
 	glfwTerminate();
-	delete ts;
 }
 
 GLFWwindow* Render::getWin()
@@ -114,7 +114,7 @@ void Render::prepareScene()
 
 void Render::renderScene()
 {
-	ts->draw();
+	renderWorld->render();
 }
 
 void Render::afterRender()
