@@ -4,6 +4,10 @@
 
 #include <stb/stb_image.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 bool loop = true;
 bool checkLoop()
 {
@@ -32,6 +36,7 @@ void setLoop(bool lp)
 float vertices1[] = { 
 	// vec的位置			color			texture的位置。 注：texture和vec的是上下左右颠倒的 
 	// 或者在加载图片时使用 stbi_set_flip_vertically_on_load(true); 翻转一下
+	// 或者直接在vs里面把y翻转处理  TexCoord = vec2(inTexCoord.x, 1.0 - inTexCoord.y);
 		 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
 		 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
 		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
@@ -55,7 +60,6 @@ int main()
 	ro2->attachVertexAttribPointer(2, 2, false, 8, 6);
 	ro2->setDrawVerNum(6);
 	render.gerRenderWorld()->regRenderObject(ro2->getName(), ro2);
-
 
 	///* texture
 	unsigned int texture[2];
@@ -144,14 +148,21 @@ int main()
 	glBindTexture(GL_TEXTURE_2D, texture[0]);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, texture[1]);
-	///*
-
 
 	while (checkLoop())
 	{
 		float timeValue = glfwGetTime();
+		auto temp = sin(timeValue);
+
+		///* color
 		int vertexColorLocation = glGetUniformLocation(shader->getID(), "muxColor");
-		glUniform4f(vertexColorLocation, sin(timeValue) + 0.1, sin(timeValue), sin(timeValue) - 0.1, (sin(timeValue) / 2.0f));
+		glUniform4f(vertexColorLocation, temp + 0.1, temp, temp - 0.1, (temp / 2.0f));
+
+		///* transform
+		glm::mat4 trans = glm::mat4(1.0f);
+		trans = glm::rotate(trans, timeValue, glm::vec3(1.0, 1.0, 1.0));
+		trans = glm::scale(trans, glm::vec3(temp, temp, temp));
+		shader->setMat4("boxTransform", trans);
 
 		render.draw();
 	}

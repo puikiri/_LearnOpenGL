@@ -4,6 +4,10 @@
 #include "../../core/include.h"
 #include "../../core/file.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 class Shader
 {
 public:
@@ -15,6 +19,10 @@ public:
 	inline void setBool(const std::string &name, bool value) const { glUniform1i(glGetUniformLocation(shaderId, name.c_str()), (int)value);  };
 	inline void setInt(const std::string &name, int value) const { glUniform1i(glGetUniformLocation(shaderId, name.c_str()), value); };
 	inline void setFloat(const std::string &name, float value) const { glUniform1f(glGetUniformLocation(shaderId, name.c_str()), value); };
+	inline void setMat4(const std::string &name, glm::mat4 value, int matCount = 1, bool transpose = false) const {
+	//								二参：传入矩阵数，三参：是否转置(用于系统和gl的横竖不对齐的问题)
+		glUniformMatrix4fv(glGetUniformLocation(shaderId, name.c_str()), matCount, transpose ? GL_TRUE : GL_FALSE, glm::value_ptr(value));
+	};
 private:
 	Shader() { };
 	void checkCompileShader(unsigned int shader, const char* compileName);
