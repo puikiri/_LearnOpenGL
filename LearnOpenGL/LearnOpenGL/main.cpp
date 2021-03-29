@@ -137,6 +137,7 @@ int main()
 	}
 
 	///* texture
+	///* open GL 是个状态机，当前bind了什么texture，就会用什么texture。shader同理，当前启用什么就用什么。
 	unsigned int texture[2];
 	glGenTextures(1, &texture[0]);
 	glBindTexture(GL_TEXTURE_2D, texture[0]);
@@ -215,8 +216,8 @@ int main()
 
 	// 设置东西对应的混合
 	shader->active(); // 注意，需要先激活要设置的shader在设置，不然会不知道设置到哪里去。
-	shader->setInt("baseTexture", 0);
-	shader->setInt("mixTexture", 1);
+	shader->setInt("baseTexture", 0); // 注：这里的0/1对应的是下面激活的纹理单元的 GL_TEXTURE0/GL_TEXTURE1..
+	shader->setInt("mixTexture", 1); // 也就是说，这里和下面是成套成对的。
 	shader->deactive();
 	// 混合两个图在同一个纹理单元上（用在同一个fs上）
 	glActiveTexture(GL_TEXTURE0);// 在绑定纹理之前需要先激活纹理单元 
