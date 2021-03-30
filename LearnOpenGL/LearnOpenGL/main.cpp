@@ -98,9 +98,92 @@ glm::vec3 cubePositions[] = {
   glm::vec3(-1.3f,  1.0f, -1.5f)
 };
 
+///* camera
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 5.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+float deltaTime = 0.0f; // 当前帧与上一帧的时间差
+float lastFrame = 0.0f; // 上一帧的时间
+
+bool firstMouse = true;
+float yaw = -90;
+float pitch = 0;
+float fov = 45.f;
+void processInput(int key, int scancode, int action, int mods)
+{
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+		setLoop(false);
+	float cameraSpeed = 5.f * deltaTime; // adjust accordingly
+	if (key == GLFW_KEY_W && action != GLFW_RELEASE)
+		cameraPos += cameraSpeed * cameraFront;
+	if (key == GLFW_KEY_S && action != GLFW_RELEASE)
+		cameraPos -= cameraSpeed * cameraFront;
+	if (key == GLFW_KEY_A && action != GLFW_RELEASE)
+		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+	if (key == GLFW_KEY_D && action != GLFW_RELEASE)
+		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+	if (key == GLFW_KEY_R && action != GLFW_RELEASE)
+	{
+		cameraPos = glm::vec3(0.0f, 0.0f, 5.0f);
+		cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+		cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+		firstMouse = true;
+		yaw = -90;
+		pitch = 0;
+	}
+}
+
+float lastX = winSizeW/2, lastY = winSizeH/2;
+float sensitivity = 0.05f;
+void cursorChangeCb(double xPos, double yPos)
+{
+	if (firstMouse)
+	{
+		lastX = xPos;
+		lastY = yPos;
+		firstMouse = false;
+	}
+
+	float xoffset = xPos - lastX;
+	float yoffset = lastY - yPos; // 注意这里是相反的，因为y坐标是从底部往顶部依次增大的
+	lastX = xPos;
+	lastY = yPos;
+
+	xoffset *= sensitivity;
+	yoffset *= sensitivity;
+
+	yaw += xoffset;
+	pitch += yoffset;
+
+	if (pitch > 89.0f)
+		pitch = 89.0f;
+	if (pitch < -89.0f)
+		pitch = -89.0f;
+
+	glm::vec3 front;
+	front.x = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
+	front.y = sin(glm::radians(pitch));
+	front.z = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
+	cameraFront = glm::normalize(front);
+}
+
+void scrollChange(double xoffset, double yoffset)
+{
+	if (fov >= 1.0f && fov <= viewFov)
+		fov -= yoffset;
+	if (fov <= 1.0f)
+		fov = 1.0f;
+	if (fov >= viewFov)
+		fov = viewFov;
+}
 int main()
 {
 	Render render;
+	render.RegWinKeyEnterCallBack("processInput", processInput);
+	render.RegWinCursorChangeCallBack("cursorChangeCb", cursorChangeCb);
+	render.RegWinScrollCallBack("scrollChange", scrollChange);
+	// TODO RE CODE
 
 	///* 视口
 	/*
@@ -117,8 +200,8 @@ int main()
 	//			远平面太大的话 会导致计算量激增。
 	glm::mat4 modelMat = glm::mat4(1.0f);
 	modelMat = glm::rotate(modelMat, glm::radians(viewFov), glm::vec3(1.0f, 0.0f, 0.0f));
-	glm::mat4 viewMat = glm::mat4(1.0f);
-	viewMat = glm::translate(viewMat, glm::vec3(0.0f, 0.0f, -3.0f));
+	/*glm::mat4 viewMat = glm::mat4(1.0f);
+	viewMat = glm::translate(viewMat, glm::vec3(0.0f, 0.0f, -3.0f));*/
 	glm::mat4 projectionMat = glm::perspective(glm::radians(viewFov), (float)winSizeW / (float)winSizeH, viewZNear, viewZFar);
 
 	///* shader
@@ -235,10 +318,19 @@ int main()
 		glUniform4f(vertexColorLocation, temp + 0.1, temp, temp - 0.1, (temp / 2.0f));
 
 		///* transform
+		auto temp2 = sin(timeValue / 5);
 		glm::mat4 trans = glm::mat4(1.0f);
 		trans = glm::rotate(trans, timeValue, glm::vec3(1.0, 1.0, 1.0));
-		trans = glm::scale(trans, glm::vec3(temp, temp, temp));
+		trans = glm::scale(trans, glm::vec3(temp2, temp2, temp2));
 		shader->setMat4("boxTransform", trans);
+
+
+		float currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+		glm::mat4 viewMat = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+
+		projectionMat = glm::perspective(glm::radians(fov), (float)winSizeW / (float)winSizeH, viewZNear, viewZFar);
 
 		shader->setMat4("modelMat", modelMat);
 		shader->setMat4("viewMat", viewMat);
