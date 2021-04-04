@@ -15,7 +15,7 @@ public:
 	~Shader() { glDeleteProgram(shaderId); };
 	inline unsigned int getID() const { return shaderId; }
 	inline void active() { glUseProgram(shaderId); };
-	inline void deactive() { glDeleteProgram(shaderId); };
+	inline void deactive() { /*glDeleteProgram(0);*/ };
 	inline void setBool(const std::string &name, bool value) const { glUniform1i(glGetUniformLocation(shaderId, name.c_str()), (int)value);  };
 	inline void setInt(const std::string &name, int value) const { glUniform1i(glGetUniformLocation(shaderId, name.c_str()), value); };
 	inline void setFloat(const std::string &name, float value) const { glUniform1f(glGetUniformLocation(shaderId, name.c_str()), value); };
