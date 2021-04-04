@@ -2,17 +2,21 @@
 #define RENDER_OBJECT_H
 
 #include "../shader/shader.h"
+#include "renderBase.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-class RenderObject
+class RenderObject:public virtual RenderBase
 {
 public:
 	RenderObject(std::shared_ptr<Shader> _shader = nullptr);
 	~RenderObject();
-	void draw();
+	virtual void beforeRender();
+	virtual void render();
+	virtual void afterRender();
+
 	void attachShader(std::shared_ptr<Shader>_shader) { shader = _shader; };
 	void clearShader() { shader = nullptr; };
 	std::shared_ptr<Shader> getShader() { return shader; };
@@ -22,14 +26,11 @@ public:
 	std::string  getName() { return name; };
 	void setDrawVerNum(unsigned int num) { verNum = num; };
 	void setDrawVerOffset(unsigned int offset) { verOffset = offset; };
-	void setExTransformMat(glm::mat4& mat) 
-	{ 
-		exTransformlMat *= mat;
-	};
-	void resetExTransformMat()
-	{
-		exTransformlMat = glm::mat4(1.0f);
-	};
+	void setExTransformName(std::string name) { exTransformMatName = name; };
+	std::string getExTransformName() { return exTransformMatName; };
+	void setExTransformMat(glm::mat4& mat) { exTransformlMat *= mat; };
+	glm::mat4 getExTransformMat() { return exTransformlMat; };
+	void resetExTransformMat() { exTransformlMat = glm::mat4(1.0f);  };
 private:
 
 public:
@@ -43,7 +44,7 @@ private:
 	unsigned int verNum = 0;
 	unsigned int verOffset = 0;
 	std::string name;
-	std::string exTransformMatName = "exTransform";
+	std::string exTransformMatName = "localTransform";
 	glm::mat4 exTransformlMat = glm::mat4(1.0f);
 };
 
@@ -64,7 +65,11 @@ RenderObject::~RenderObject()
 	glDeleteBuffers(1, &EBO);
 }
 
-void RenderObject::draw()
+void RenderObject::beforeRender()
+{
+}
+
+void RenderObject::render()
 {
 	if (shader)
 	{
@@ -73,13 +78,17 @@ void RenderObject::draw()
 			shader->setMat4(exTransformMatName, exTransformlMat);
 	}
 	glBindVertexArray(VAO);
-	if(isEBO)
+	if (isEBO)
 		glDrawElements(GL_TRIANGLES, verNum, GL_UNSIGNED_INT, 0);
 	else
 		glDrawArrays(GL_TRIANGLES, verOffset, verNum);
 	glBindVertexArray(0);
 	if (shader)
 		shader->deactive();
+}
+
+void RenderObject::afterRender()
+{
 }
 
 void RenderObject::createVBORenderObject(float vertices[], int verticesSize, int locationIndex, int vecSize, bool normalized, int verStep, int verOffset)

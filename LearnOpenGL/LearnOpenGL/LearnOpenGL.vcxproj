@@ -130,12 +130,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="client\render\elementBuffer.h" />
-    <ClInclude Include="client\render\render.h" />
+    <ClInclude Include="client\render\renderBase.h" />
     <ClInclude Include="client\render\renderWorld.h" />
     <ClInclude Include="client\render\renderObject.h" />
     <ClInclude Include="cache\testSence.h" />
     <ClInclude Include="client\render\textureManager.h" />
     <ClInclude Include="client\render\textureObject.h" />
+    <ClInclude Include="client\render\window.h" />
     <ClInclude Include="client\shader\shader.h" />
     <ClInclude Include="client\render\vertexArray.h" />
     <ClInclude Include="client\render\vertexBuffer.h" />

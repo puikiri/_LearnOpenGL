@@ -38,9 +38,6 @@
     <ClInclude Include="lib\include\KHR\khrplatform.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="client\render\render.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="client\render\vertexArray.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -930,6 +927,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="lib\include\glm\vector_relational.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="client\render\window.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="client\render\renderBase.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,5 +1,5 @@
 
-#include "client/render/render.h"
+#include "client/render/renderWorld.h"
 #include "client/render/renderObject.h"
 
 #include <stb/stb_image.h>
@@ -179,10 +179,10 @@ void scrollChange(double xoffset, double yoffset)
 }
 int main()
 {
-	Render render;
-	render.RegWinKeyEnterCallBack("processInput", processInput);
-	render.RegWinCursorChangeCallBack("cursorChangeCb", cursorChangeCb);
-	render.RegWinScrollCallBack("scrollChange", scrollChange);
+	RenderWorld render;
+	render.getWindow()->RegWinKeyEnterCallBack("processInput", processInput);
+	render.getWindow()->RegWinCursorChangeCallBack("cursorChangeCb", cursorChangeCb);
+	render.getWindow()->RegWinScrollCallBack("scrollChange", scrollChange);
 	// TODO RE CODE
 
 	///* йс©з
@@ -216,7 +216,7 @@ int main()
 	glm::mat4 tempMat = glm::mat4(1.0f);
 	tempMat = glm::translate(tempMat, cubePositions[i]);
 	ro2->setExTransformMat(tempMat);
-	render.gerRenderWorld()->regRenderObject(ro2->getName(), ro2);
+	render.regRenderObject(ro2->getName(), ro2);
 	}
 
 	///* texture
@@ -336,7 +336,7 @@ int main()
 		shader->setMat4("viewMat", viewMat);
 		shader->setMat4("projectionMat", projectionMat);
 
-		render.draw();
+		render.render();
 	}
 	return -1;
 }
