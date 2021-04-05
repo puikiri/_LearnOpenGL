@@ -22,6 +22,7 @@ public:
 	inline void setBool(const std::string &name, bool value) { active(); glUniform1i(glGetUniformLocation(shaderId, name.c_str()), (int)value); };
 	inline void setInt(const std::string &name, int value) { active(); glUniform1i(glGetUniformLocation(shaderId, name.c_str()), value); };
 	inline void setFloat(const std::string &name, float value) { active(); glUniform1f(glGetUniformLocation(shaderId, name.c_str()), value); };
+	inline void setVec3(const std::string &name, glm::vec3 value) { active(); glUniform3f(glGetUniformLocation(shaderId, name.c_str()), value.x, value.y, value.z); };
 	inline void setVec4(const std::string &name, glm::vec4 value) { active(); glUniform4f(glGetUniformLocation(shaderId, name.c_str()), value.x, value.y, value.z, value.w); };
 	inline void setMat4(const std::string &name, glm::mat4 value, int matCount = 1, bool transpose = false) {
 		active();

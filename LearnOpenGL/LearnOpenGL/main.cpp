@@ -20,6 +20,42 @@ void setLoop(bool lp)
 	loop = lp;
 }
 
+float vertices2[] = {
+	// vec的位置			color			texture的位置。 注：texture和vec的是上下左右颠倒的 
+	// 或者在加载图片时使用 stbi_set_flip_vertically_on_load(true); 翻转一下
+	// 或者直接在vs里面把y翻转处理  TexCoord = vec2(inTexCoord.x, 1.0 - inTexCoord.y);
+	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, -1.0f,   0.0f, 0.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f, 0.0f, -1.0f,   1.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f,  0.0f, 0.0f, -1.0f,   1.0f, 1.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f, 0.0f, -1.0f,   0.0f, 1.0f,
+
+
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,   0.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,   1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 1.0f,   1.0f, 1.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 1.0f,   0.0f, 1.0f,
+
+	-0.5f,  0.5f,  0.5f,  -1.0f, 0.0f, 0.0f,   1.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f,  -1.0f, 0.0f, 0.0f,   1.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  -1.0f, 0.0f, 0.0f,   0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  -1.0f, 0.0f, 0.0f,   0.0f, 0.0f,
+
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,   1.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 0.0f, 0.0f,   1.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 0.0f,   0.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f,   0.0f, 0.0f,
+
+	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f, 0.0f,   0.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f, -1.0f, 0.0f,   1.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f, 0.0f,   1.0f, 0.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, -1.0f, 0.0f,   0.0f, 0.0f,
+
+	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f,   0.0f, 1.0f,
+	 0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f,   1.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
+};
+
 float vertices1[] = { 
 	// vec的位置			color			texture的位置。 注：texture和vec的是上下左右颠倒的 
 	// 或者在加载图片时使用 stbi_set_flip_vertically_on_load(true); 翻转一下
@@ -210,11 +246,11 @@ int main()
 	///* sunLight
 	std::shared_ptr<Shader> sunLightShader = std::make_shared<Shader>("../LearnOpenGL/resource/shader/light.vs", "../LearnOpenGL/resource/shader/light.fs");
 	std::shared_ptr<RenderObject> ao3 = std::make_shared<RenderObject>(sunLightShader);
-	ao3->createEBORenderObject(vertices1, sizeof(vertices1), vertices1indices, sizeof(vertices1indices), 0, 3, false, 8, 0);
+	ao3->createEBORenderObject(vertices2, sizeof(vertices2), vertices1indices, sizeof(vertices1indices), 0, 3, false, 8, 0);
 	ao3->attachVertexAttribPointer(1, 3, false, 8, 3);
 	ao3->attachVertexAttribPointer(2, 2, false, 8, 6);
 	ao3->setDrawVerNum(36);
-	ao3->setPosition(glm::vec3(1.0f, 1.0f, 1.0f));
+	ao3->setPosition(glm::vec3(2.0f, 2.0f, 2.0f));
 	render->regRenderObject(ao3->getName(), ao3);
 	sunLightShader->setTexture(0, "baseTexture", "../LearnOpenGL/resource/texture/sunLight.png");
 	glm::mat4 ro3Trans = glm::mat4(1.0f);
@@ -225,7 +261,7 @@ int main()
 	///* lightBox
 	std::shared_ptr<Shader> lightBoxShader = std::make_shared<Shader>("../LearnOpenGL/resource/shader/lightBox.vs", "../LearnOpenGL/resource/shader/lightBox.fs");
 	std::shared_ptr<RenderObject> ao4 = std::make_shared<RenderObject>(lightBoxShader);
-	ao4->createEBORenderObject(vertices1, sizeof(vertices1), vertices1indices, sizeof(vertices1indices), 0, 3, false, 8, 0);
+	ao4->createEBORenderObject(vertices2, sizeof(vertices2), vertices1indices, sizeof(vertices1indices), 0, 3, false, 8, 0);
 	ao4->attachVertexAttribPointer(1, 3, false, 8, 3);
 	ao4->attachVertexAttribPointer(2, 2, false, 8, 6);
 	ao4->setDrawVerNum(36);
@@ -238,13 +274,16 @@ int main()
 	auto lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	sunLightShader->setVec4("lightColor", lightColor);
 	auto objectColor = lightColor;
+	lightBoxShader->setVec4("lightColor", lightColor);
 	lightBoxShader->setVec4("objectColor", objectColor);
+	lightBoxShader->setMat4("modelMat", modelMat);
 
 	while (checkLoop())
 	{
 		float timeValue = glfwGetTime();
 		auto sin_timeValue = sin(timeValue);
 		auto sin_timeValue_2 = sin(timeValue / 5);
+		auto cos_timeValue_2 = cos(timeValue / 5);
 
 		deltaTime = timeValue - lastFrame;
 		lastFrame = timeValue;
@@ -252,14 +291,22 @@ int main()
 		glm::mat4 viewMat = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 		projectionMat = glm::perspective(glm::radians(fov), (float)winSizeW / (float)winSizeH, viewZNear, viewZFar);
 
+		auto color = glm::vec4(sin_timeValue + 0.1, sin_timeValue, sin_timeValue - 0.1, (sin_timeValue / 2.0f));
+		// ao3 pos change 
+		ro3Trans = glm::mat4(1.0f);
+		auto pos = glm::vec3(2.0f * sin_timeValue_2, 2.0f * cos_timeValue_2, sin_timeValue * cos_timeValue_2);
+		ao3->setPosition(pos);
+		ro3Trans = glm::translate(ro3Trans, ao3->getPosition());
+		ro3Trans = glm::scale(ro3Trans, glm::vec3(0.5, 0.5, 0.5));
 		auto ro3Transform = projectionMat * viewMat * modelMat * ro3Trans;
 		ao3->setTransformMat(ro3Transform);
-		auto color = glm::vec4(sin_timeValue + 0.1, sin_timeValue, sin_timeValue - 0.1, (sin_timeValue / 2.0f));
-		sunLightShader->setVec4("lightColor", lightColor);
+		sunLightShader->setVec4("lightColor", color);
 
 		auto ro4Transform = projectionMat * viewMat * modelMat * ro4Trans;
 		ao4->setTransformMat(ro4Transform);
-		lightBoxShader->setVec4("lightColor", lightColor);
+		lightBoxShader->setVec3("lightPos", ao3->getPosition());
+		lightBoxShader->setVec4("lightColor", color);
+		lightBoxShader->setVec3("viewPos", cameraPos);
 
 		/*  box
 		for (auto ro : boxRenderVecs)
