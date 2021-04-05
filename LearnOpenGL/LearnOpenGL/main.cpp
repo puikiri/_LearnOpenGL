@@ -189,6 +189,7 @@ int main()
 	glm::mat4 projectionMat = glm::perspective(glm::radians(viewFov), (float)winSizeW / (float)winSizeH, viewZNear, viewZFar);
 
 	///* shader
+	std::map<std::string, std::shared_ptr<RenderObject>> boxRenderVecs;
 	std::shared_ptr<Shader> shader = std::make_shared<Shader>("../LearnOpenGL/resource/shader/box.vs", "../LearnOpenGL/resource/shader/box.fs");
 	for (int i = 0; i < cubeNum; i++)
 	{
@@ -199,6 +200,7 @@ int main()
 		ro2->setDrawVerNum(36);
 		ro2->setPosition(cubePositions[i]);
 		render->regRenderObject(ro2->getName(), ro2);
+		boxRenderVecs[ro2->getName()] = ro2;
 	}
 
 	///* texture
@@ -217,7 +219,7 @@ int main()
 		glm::mat4 viewMat = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 		projectionMat = glm::perspective(glm::radians(fov), (float)winSizeW / (float)winSizeH, viewZNear, viewZFar);
 
-		for (auto ro : render->getRenderObjects())
+		for (auto ro : boxRenderVecs)
 		{
 			glm::mat4 trans = glm::mat4(1.0f);
 			//trans = glm::translate(trans, ro.second->getPosition()); // 变换的前后顺序是有影响的。从下到上矩阵相乘。
