@@ -18,6 +18,7 @@ public:
 
 	inline void regRenderObject(const std::string &regId, std::shared_ptr<RenderObject> obj) { renderVec[regId] = obj; }
 	inline void removeRenderObject(const std::string &regId) { renderVec.erase(regId); }
+	inline std::map<std::string, std::shared_ptr<RenderObject>>  getRenderObjects() { return renderVec; }
 	void render();
 private:
 	RenderWorld();
