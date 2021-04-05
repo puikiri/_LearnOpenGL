@@ -36,9 +36,9 @@ RenderWorld::~RenderWorld()
 
 void RenderWorld::render()
 {
-	win->beforeRender();
 	for (auto ro : renderVec)
 		ro.second->beforeRender();
+	win->beforeRender();
 
 	for (auto ro : renderVec)
 		ro.second->render();
