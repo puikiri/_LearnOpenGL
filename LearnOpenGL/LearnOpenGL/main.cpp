@@ -155,6 +155,7 @@ void scrollChange(double xoffset, double yoffset)
 
 int main()
 {
+	/* box
 	cubePositions.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f));
 	cubePositions.emplace_back(glm::vec3(0.0f, 4.0f, 0.0f));
 	cubePositions.emplace_back(glm::vec3(0.0f, -4.0f, 0.0f));
@@ -163,7 +164,7 @@ int main()
 	cubePositions.emplace_back(glm::vec3(-2.0f, 0.0f, 0.0f));
 	cubePositions.emplace_back(glm::vec3(-4.0f, 0.0f, 0.0f));
 	int cubeNum = cubePositions.size();
-
+	*/
 	RenderWorld* render = RenderWorld::instance();
 	Window* window = Window::instance();
 	window->RegWinKeyEnterCallBack("processInput", processInput);
@@ -187,13 +188,13 @@ int main()
 	glm::mat4 modelMat = glm::mat4(1.0f);
 	modelMat = glm::rotate(modelMat, glm::radians(viewFov), glm::vec3(1.0f, 0.0f, 0.0f));
 	glm::mat4 projectionMat = glm::perspective(glm::radians(viewFov), (float)winSizeW / (float)winSizeH, viewZNear, viewZFar);
-
-	///* shader
+	/* box
+	///* box
 	std::map<std::string, std::shared_ptr<RenderObject>> boxRenderVecs;
-	std::shared_ptr<Shader> shader = std::make_shared<Shader>("../LearnOpenGL/resource/shader/box.vs", "../LearnOpenGL/resource/shader/box.fs");
+	std::shared_ptr<Shader> boxShader = std::make_shared<Shader>("../LearnOpenGL/resource/shader/box.vs", "../LearnOpenGL/resource/shader/box.fs");
 	for (int i = 0; i < cubeNum; i++)
 	{
-		std::shared_ptr<RenderObject> ro2 = std::make_shared<RenderObject>(shader);
+		std::shared_ptr<RenderObject> ro2 = std::make_shared<RenderObject>(boxShader);
 		ro2->createEBORenderObject(vertices1, sizeof(vertices1), vertices1indices, sizeof(vertices1indices), 0, 3, false, 8, 0);
 		ro2->attachVertexAttribPointer(1, 3, false, 8, 3);
 		ro2->attachVertexAttribPointer(2, 2, false, 8, 6);
@@ -202,10 +203,42 @@ int main()
 		render->regRenderObject(ro2->getName(), ro2);
 		boxRenderVecs[ro2->getName()] = ro2;
 	}
+	boxShader->setTexture(0, "baseTexture", "../LearnOpenGL/resource/texture/texture_unhell.png");
+	boxShader->setTexture(1, "mixTexture", "../LearnOpenGL/resource/texture/texture_unhell_tag.png");
+	*/
 
-	///* texture
-	shader->setTexture(0, "baseTexture", "../LearnOpenGL/resource/texture/texture_unhell.png");
-	shader->setTexture(1, "mixTexture", "../LearnOpenGL/resource/texture/texture_unhell_tag.png");
+	///* sunLight
+	std::shared_ptr<Shader> sunLightShader = std::make_shared<Shader>("../LearnOpenGL/resource/shader/light.vs", "../LearnOpenGL/resource/shader/light.fs");
+	std::shared_ptr<RenderObject> ao3 = std::make_shared<RenderObject>(sunLightShader);
+	ao3->createEBORenderObject(vertices1, sizeof(vertices1), vertices1indices, sizeof(vertices1indices), 0, 3, false, 8, 0);
+	ao3->attachVertexAttribPointer(1, 3, false, 8, 3);
+	ao3->attachVertexAttribPointer(2, 2, false, 8, 6);
+	ao3->setDrawVerNum(36);
+	ao3->setPosition(glm::vec3(1.0f, 1.0f, 1.0f));
+	render->regRenderObject(ao3->getName(), ao3);
+	sunLightShader->setTexture(0, "baseTexture", "../LearnOpenGL/resource/texture/sunLight.png");
+	glm::mat4 ro3Trans = glm::mat4(1.0f);
+	ro3Trans = glm::translate(ro3Trans, ao3->getPosition());
+	ro3Trans = glm::scale(ro3Trans, glm::vec3(0.5, 0.5, 0.5));
+
+
+	///* lightBox
+	std::shared_ptr<Shader> lightBoxShader = std::make_shared<Shader>("../LearnOpenGL/resource/shader/lightBox.vs", "../LearnOpenGL/resource/shader/lightBox.fs");
+	std::shared_ptr<RenderObject> ao4 = std::make_shared<RenderObject>(lightBoxShader);
+	ao4->createEBORenderObject(vertices1, sizeof(vertices1), vertices1indices, sizeof(vertices1indices), 0, 3, false, 8, 0);
+	ao4->attachVertexAttribPointer(1, 3, false, 8, 3);
+	ao4->attachVertexAttribPointer(2, 2, false, 8, 6);
+	ao4->setDrawVerNum(36);
+	ao4->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+	render->regRenderObject(ao4->getName(), ao4);
+	lightBoxShader->setTexture(0, "baseTexture", "../LearnOpenGL/resource/texture/lightBox.png");
+	glm::mat4 ro4Trans = glm::mat4(1.0f);
+	ro4Trans = glm::translate(ro4Trans, ao4->getPosition());
+
+	auto lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	sunLightShader->setVec4("lightColor", lightColor);
+	auto objectColor = lightColor;
+	lightBoxShader->setVec4("objectColor", objectColor);
 
 	while (checkLoop())
 	{
@@ -219,6 +252,16 @@ int main()
 		glm::mat4 viewMat = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 		projectionMat = glm::perspective(glm::radians(fov), (float)winSizeW / (float)winSizeH, viewZNear, viewZFar);
 
+		auto ro3Transform = projectionMat * viewMat * modelMat * ro3Trans;
+		ao3->setTransformMat(ro3Transform);
+		auto color = glm::vec4(sin_timeValue + 0.1, sin_timeValue, sin_timeValue - 0.1, (sin_timeValue / 2.0f));
+		sunLightShader->setVec4("lightColor", lightColor);
+
+		auto ro4Transform = projectionMat * viewMat * modelMat * ro4Trans;
+		ao4->setTransformMat(ro4Transform);
+		lightBoxShader->setVec4("lightColor", lightColor);
+
+		/*  box
 		for (auto ro : boxRenderVecs)
 		{
 			glm::mat4 trans = glm::mat4(1.0f);
@@ -234,7 +277,7 @@ int main()
 			auto color = glm::vec4(sin_timeValue + 0.1 + roPos.x / 10, sin_timeValue + roPos.y / 10, sin_timeValue - 0.1 + roPos.z / 10, (sin_timeValue / 2.0f));
 			ro.second->setMuxColor(color);
 		}
-
+		*/
 		render->render();
 	}
 	return -1;

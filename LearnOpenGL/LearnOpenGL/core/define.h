@@ -2,7 +2,7 @@
 #define DEFINE_H
 
 /* system */
-#define glfwClearColor 0.2f, 0.3f, 0.3f, 1.0f
+#define glfwClearColor 0.0f, 0.0f, 0.0f, 1.0f
 #define winSizeW 1080
 #define winSizeH 720
 #define viewFov 60.f

@@ -1354,5 +1354,9 @@
     <None Include="lib\include\glm\gtx\wrap.inl">
       <Filter>头文件</Filter>
     </None>
+    <None Include="resource\shader\light.vs" />
+    <None Include="resource\shader\light.fs" />
+    <None Include="resource\shader\lightBox.vs" />
+    <None Include="resource\shader\lightBox.fs" />
   </ItemGroup>
 </Project>

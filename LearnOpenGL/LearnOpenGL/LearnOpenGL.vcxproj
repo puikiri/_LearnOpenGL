@@ -571,6 +571,10 @@
     <None Include="lib\include\glm\gtx\vector_angle.inl" />
     <None Include="lib\include\glm\gtx\vector_query.inl" />
     <None Include="lib\include\glm\gtx\wrap.inl" />
+    <None Include="resource\shader\light.fs" />
+    <None Include="resource\shader\light.vs" />
+    <None Include="resource\shader\lightBox.fs" />
+    <None Include="resource\shader\lightBox.vs" />
     <None Include="resource\shader\ShiningDelta.fs" />
     <None Include="resource\shader\ShiningDelta.vs" />
     <None Include="cache\Test.fs" />
