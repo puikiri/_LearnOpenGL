@@ -33,6 +33,11 @@ public:
 	void resetTransformMat() { transformlMat = glm::mat4(1.0f); };
 	void setPosition(glm::vec3 pos) { position = pos; };
 	glm::vec3 getPosition() { return position; };
+	void setMuxColorUniformName(std::string name) { muxColorUniformName = name; };
+	std::string getMuxColorUniformName() { return muxColorUniformName; };
+	void setMuxColor(glm::vec4& v4) { muxColor = v4; };
+	glm::vec4 getMuxColor() { return muxColor; };
+	void resetMuxColor() { muxColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f); };
 private:
 
 public:
@@ -49,6 +54,8 @@ private:
 	glm::vec3 position;
 	std::string transformUniformName = "transform";
 	glm::mat4 transformlMat = glm::mat4(1.0f);
+	std::string muxColorUniformName = "muxColor";
+	glm::vec4 muxColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 };
 
 RenderObject::RenderObject(std::shared_ptr<Shader> _shader)
@@ -80,6 +87,8 @@ void RenderObject::render()
 		shader->bindTexture();
 		if (!transformUniformName.empty())
 			shader->setMat4(transformUniformName, transformlMat);
+		if (!muxColorUniformName.empty())
+			shader->setVec4(muxColorUniformName, muxColor);
 	}
 	glBindVertexArray(VAO);
 	if (isEBO)

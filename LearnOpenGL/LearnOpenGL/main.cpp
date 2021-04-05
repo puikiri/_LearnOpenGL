@@ -7,6 +7,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <vector>
+
 bool loop = true;
 bool checkLoop()
 {
@@ -17,20 +19,6 @@ void setLoop(bool lp)
 {
 	loop = lp;
 }
-
-//float vertices1[] = {
-//	-0.4f, -0.4f, 0.0f, 0.0f, 0.0f, 1.0f,
-//	0.4f, -0.4f, 0.0f, 0.0f, 1.0f, 0.0f,
-//	0.f, 0.7f, 0.0f, 1.0f, 0.0f, 0.0f,
-//	-0.4f, 0.4f, 0.0f, 1.0f, 0.0f, 0.0f,
-//	0.4f, 0.4f, 0.0f, 0.0f, 1.0f, 0.0f,
-//	0.f, -0.7f, 0.0f, 0.0f, 0.0f, 1.0f,
-//};
-//
-//unsigned int vertices1indices[] = {
-//	0, 1, 2,
-//	3, 4, 5,
-//};
 
 float vertices1[] = { 
 	// vec的位置			color			texture的位置。 注：texture和vec的是上下左右颠倒的 
@@ -83,11 +71,7 @@ unsigned int vertices1indices[] = {
 		21, 22, 23,
 };
 
-int cubeNum = 10;
-glm::vec3 cubePositions[] = {
-  glm::vec3(0.0f,  0.0f,  0.0f),
-  glm::vec3(2.0f,  1.0f, -1.0f)
-};
+std::vector<glm::vec3> cubePositions;
 
 ///* camera
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 5.0f);
@@ -168,8 +152,18 @@ void scrollChange(double xoffset, double yoffset)
 	if (fov >= viewFov)
 		fov = viewFov;
 }
+
 int main()
 {
+	cubePositions.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f));
+	cubePositions.emplace_back(glm::vec3(0.0f, 4.0f, 0.0f));
+	cubePositions.emplace_back(glm::vec3(0.0f, -4.0f, 0.0f));
+	cubePositions.emplace_back(glm::vec3(2.0f, 0.0f, 0.0f));
+	cubePositions.emplace_back(glm::vec3(4.0f, 0.0f, 0.0f));
+	cubePositions.emplace_back(glm::vec3(-2.0f, 0.0f, 0.0f));
+	cubePositions.emplace_back(glm::vec3(-4.0f, 0.0f, 0.0f));
+	int cubeNum = cubePositions.size();
+
 	RenderWorld* render = RenderWorld::instance();
 	Window* window = Window::instance();
 	window->RegWinKeyEnterCallBack("processInput", processInput);
@@ -198,13 +192,13 @@ int main()
 	std::shared_ptr<Shader> shader = std::make_shared<Shader>("../LearnOpenGL/resource/shader/box.vs", "../LearnOpenGL/resource/shader/box.fs");
 	for (int i = 0; i < cubeNum; i++)
 	{
-	std::shared_ptr<RenderObject> ro2 = std::make_shared<RenderObject>(shader);
-	ro2->createEBORenderObject(vertices1, sizeof(vertices1), vertices1indices, sizeof(vertices1indices), 0, 3, false, 8, 0);
-	ro2->attachVertexAttribPointer(1, 3, false, 8, 3);
-	ro2->attachVertexAttribPointer(2, 2, false, 8, 6);
-	ro2->setDrawVerNum(36);
-	ro2->setPosition(cubePositions[i]);
-	render->regRenderObject(ro2->getName(), ro2);
+		std::shared_ptr<RenderObject> ro2 = std::make_shared<RenderObject>(shader);
+		ro2->createEBORenderObject(vertices1, sizeof(vertices1), vertices1indices, sizeof(vertices1indices), 0, 3, false, 8, 0);
+		ro2->attachVertexAttribPointer(1, 3, false, 8, 3);
+		ro2->attachVertexAttribPointer(2, 2, false, 8, 6);
+		ro2->setDrawVerNum(36);
+		ro2->setPosition(cubePositions[i]);
+		render->regRenderObject(ro2->getName(), ro2);
 	}
 
 	///* texture
@@ -214,31 +208,29 @@ int main()
 	while (checkLoop())
 	{
 		float timeValue = glfwGetTime();
-		auto temp = sin(timeValue);
-
-		///* color
-		int vertexColorLocation = glGetUniformLocation(shader->getID(), "muxColor");
-		glUniform4f(vertexColorLocation, temp + 0.1, temp, temp - 0.1, (temp / 2.0f));
-
-		///* transform
-		auto temp2 = sin(timeValue / 5);
+		auto sin_timeValue = sin(timeValue);
+		auto sin_timeValue_2 = sin(timeValue / 5);
 
 		deltaTime = timeValue - lastFrame;
 		lastFrame = timeValue;
 
 		glm::mat4 viewMat = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-
 		projectionMat = glm::perspective(glm::radians(fov), (float)winSizeW / (float)winSizeH, viewZNear, viewZFar);
 
-		for (auto temp : render->getRenderObjects())
+		for (auto ro : render->getRenderObjects())
 		{
 			glm::mat4 trans = glm::mat4(1.0f);
-			trans = glm::translate(trans, temp.second->getPosition()); // 前后顺序是有影响的。变现是从下到上矩阵相乘。
+			//trans = glm::translate(trans, ro.second->getPosition()); // 变换的前后顺序是有影响的。从下到上矩阵相乘。
 			trans = glm::rotate(trans, timeValue, glm::vec3(1.0, 1.0, 1.0));
-			trans = glm::scale(trans, glm::vec3(temp2, temp2, temp2));
-			//trans = glm::translate(trans, temp.second->getPosition());
-			auto t = projectionMat * viewMat * modelMat * trans;
-			temp.second->setTransformMat(t);
+			trans = glm::scale(trans, glm::vec3(sin_timeValue_2, sin_timeValue_2, sin_timeValue_2));
+			auto roPos = ro.second->getPosition();
+			trans = glm::translate(trans, roPos);
+
+			auto transform = projectionMat * viewMat * modelMat * trans;
+			ro.second->setTransformMat(transform);
+
+			auto color = glm::vec4(sin_timeValue + 0.1 + roPos.x / 10, sin_timeValue + roPos.y / 10, sin_timeValue - 0.1 + roPos.z / 10, (sin_timeValue / 2.0f));
+			ro.second->setMuxColor(color);
 		}
 
 		render->render();
