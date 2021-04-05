@@ -124,6 +124,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="client\render\camera.cpp" />
     <ClCompile Include="lib\include\glad\glad.c" />
     <ClCompile Include="lib\include\glm\detail\glm.cpp" />
     <ClCompile Include="main.cpp" />

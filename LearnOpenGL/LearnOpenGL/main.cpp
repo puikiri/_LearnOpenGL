@@ -237,7 +237,6 @@ int main()
 		glm::mat4 trans = glm::mat4(1.0f);
 		trans = glm::rotate(trans, timeValue, glm::vec3(1.0, 1.0, 1.0));
 		trans = glm::scale(trans, glm::vec3(temp2, temp2, temp2));
-		shader->setMat4("boxTransform", trans);
 
 
 		float currentFrame = glfwGetTime();
@@ -247,9 +246,8 @@ int main()
 
 		projectionMat = glm::perspective(glm::radians(fov), (float)winSizeW / (float)winSizeH, viewZNear, viewZFar);
 
-		shader->setMat4("modelMat", modelMat);
-		shader->setMat4("viewMat", viewMat);
-		shader->setMat4("projectionMat", projectionMat);
+		auto worldTransform = projectionMat * viewMat*modelMat * trans;
+		shader->setMat4("worldTransform", worldTransform);
 
 		render->render();
 	}

@@ -24,6 +24,9 @@
     <ClCompile Include="lib\include\glm\detail\glm.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="client\render\camera.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lib\include\glad\glad.h">
