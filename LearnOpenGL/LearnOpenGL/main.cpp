@@ -86,15 +86,7 @@ unsigned int vertices1indices[] = {
 int cubeNum = 10;
 glm::vec3 cubePositions[] = {
   glm::vec3(0.0f,  0.0f,  0.0f),
-  glm::vec3(2.0f,  5.0f, -15.0f),
-  glm::vec3(-1.5f, -2.2f, -2.5f),
-  glm::vec3(-3.8f, -2.0f, -12.3f),
-  glm::vec3(2.4f, -0.4f, -3.5f),
-  glm::vec3(-1.7f,  3.0f, -7.5f),
-  glm::vec3(1.3f, -2.0f, -2.5f),
-  glm::vec3(1.5f,  2.0f, -2.5f),
-  glm::vec3(1.5f,  0.2f, -1.5f),
-  glm::vec3(-1.3f,  1.0f, -1.5f)
+  glm::vec3(2.0f,  1.0f, -1.0f)
 };
 
 ///* camera
@@ -200,8 +192,6 @@ int main()
 	//			远平面太大的话 会导致计算量激增。
 	glm::mat4 modelMat = glm::mat4(1.0f);
 	modelMat = glm::rotate(modelMat, glm::radians(viewFov), glm::vec3(1.0f, 0.0f, 0.0f));
-	/*glm::mat4 viewMat = glm::mat4(1.0f);
-	viewMat = glm::translate(viewMat, glm::vec3(0.0f, 0.0f, -3.0f));*/
 	glm::mat4 projectionMat = glm::perspective(glm::radians(viewFov), (float)winSizeW / (float)winSizeH, viewZNear, viewZFar);
 
 	///* shader
@@ -213,9 +203,7 @@ int main()
 	ro2->attachVertexAttribPointer(1, 3, false, 8, 3);
 	ro2->attachVertexAttribPointer(2, 2, false, 8, 6);
 	ro2->setDrawVerNum(36);
-	glm::mat4 tempMat = glm::mat4(1.0f);
-	tempMat = glm::translate(tempMat, cubePositions[i]);
-	ro2->setExTransformMat(tempMat);
+	ro2->setPosition(cubePositions[i]);
 	render->regRenderObject(ro2->getName(), ro2);
 	}
 
@@ -234,20 +222,24 @@ int main()
 
 		///* transform
 		auto temp2 = sin(timeValue / 5);
-		glm::mat4 trans = glm::mat4(1.0f);
-		trans = glm::rotate(trans, timeValue, glm::vec3(1.0, 1.0, 1.0));
-		trans = glm::scale(trans, glm::vec3(temp2, temp2, temp2));
 
+		deltaTime = timeValue - lastFrame;
+		lastFrame = timeValue;
 
-		float currentFrame = glfwGetTime();
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
 		glm::mat4 viewMat = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
 		projectionMat = glm::perspective(glm::radians(fov), (float)winSizeW / (float)winSizeH, viewZNear, viewZFar);
 
-		auto worldTransform = projectionMat * viewMat*modelMat * trans;
-		shader->setMat4("worldTransform", worldTransform);
+		for (auto temp : render->getRenderObjects())
+		{
+			glm::mat4 trans = glm::mat4(1.0f);
+			trans = glm::translate(trans, temp.second->getPosition()); // 前后顺序是有影响的。变现是从下到上矩阵相乘。
+			trans = glm::rotate(trans, timeValue, glm::vec3(1.0, 1.0, 1.0));
+			trans = glm::scale(trans, glm::vec3(temp2, temp2, temp2));
+			//trans = glm::translate(trans, temp.second->getPosition());
+			auto t = projectionMat * viewMat * modelMat * trans;
+			temp.second->setTransformMat(t);
+		}
 
 		render->render();
 	}

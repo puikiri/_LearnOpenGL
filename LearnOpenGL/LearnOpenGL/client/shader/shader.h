@@ -22,6 +22,7 @@ public:
 	inline void setBool(const std::string &name, bool value) const { glUniform1i(glGetUniformLocation(shaderId, name.c_str()), (int)value);  };
 	inline void setInt(const std::string &name, int value) const { glUniform1i(glGetUniformLocation(shaderId, name.c_str()), value); };
 	inline void setFloat(const std::string &name, float value) const { glUniform1f(glGetUniformLocation(shaderId, name.c_str()), value); };
+	inline void setVec4(const std::string &name, glm::vec4 value) const { glUniform4f(glGetUniformLocation(shaderId, name.c_str()), value.x, value.y, value.z, value.w); };
 	inline void setMat4(const std::string &name, glm::mat4 value, int matCount = 1, bool transpose = false) const {
 	//								二参：传入矩阵数，三参：是否转置(用于系统和gl的横竖不对齐的问题)
 		glUniformMatrix4fv(glGetUniformLocation(shaderId, name.c_str()), matCount, transpose ? GL_TRUE : GL_FALSE, glm::value_ptr(value));

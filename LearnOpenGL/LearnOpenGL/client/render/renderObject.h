@@ -26,11 +26,13 @@ public:
 	std::string  getName() { return name; };
 	void setDrawVerNum(unsigned int num) { verNum = num; };
 	void setDrawVerOffset(unsigned int offset) { verOffset = offset; };
-	void setExTransformName(std::string name) { exTransformMatName = name; };
-	std::string getExTransformName() { return exTransformMatName; };
-	void setExTransformMat(glm::mat4& mat) { exTransformlMat *= mat; };
-	glm::mat4 getExTransformMat() { return exTransformlMat; };
-	void resetExTransformMat() { exTransformlMat = glm::mat4(1.0f);  };
+	void setTransformUniformName(std::string name) { transformUniformName = name; };
+	std::string getTransformUniformName() { return transformUniformName; };
+	void setTransformMat(glm::mat4& mat) { transformlMat = mat; };
+	glm::mat4 getTransformMat() { return transformlMat; };
+	void resetTransformMat() { transformlMat = glm::mat4(1.0f); };
+	void setPosition(glm::vec3 pos) { position = pos; };
+	glm::vec3 getPosition() { return position; };
 private:
 
 public:
@@ -44,8 +46,9 @@ private:
 	unsigned int verNum = 0;
 	unsigned int verOffset = 0;
 	std::string name;
-	std::string exTransformMatName = "localTransform";
-	glm::mat4 exTransformlMat = glm::mat4(1.0f);
+	glm::vec3 position;
+	std::string transformUniformName = "transform";
+	glm::mat4 transformlMat = glm::mat4(1.0f);
 };
 
 RenderObject::RenderObject(std::shared_ptr<Shader> _shader)
@@ -75,8 +78,8 @@ void RenderObject::render()
 	{
 		shader->active();
 		shader->bindTexture();
-		if (!exTransformMatName.empty())
-			shader->setMat4(exTransformMatName, exTransformlMat);
+		if (!transformUniformName.empty())
+			shader->setMat4(transformUniformName, transformlMat);
 	}
 	glBindVertexArray(VAO);
 	if (isEBO)
