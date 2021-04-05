@@ -7,8 +7,14 @@
 class TextureManager
 {
 public:
-	TextureManager();
+	static TextureManager* instance()
+	{
+		if (!tetMgr)
+			tetMgr = new TextureManager();
+		return tetMgr;
+	}
 	~TextureManager();
+	void operator=(const TextureManager &) = delete;
 
 	unsigned int createTexture(std::string source, bool vertically_on_load = true);
 	std::shared_ptr<TextureObject> getTexture(std::string source);
@@ -16,11 +22,13 @@ public:
 	void removeTexture(std::string source);
 	void removeTexture(unsigned int texId);
 private:
+	TextureManager();
 
 public:
 
 private:
 	std::map<std::string, std::shared_ptr<TextureObject>> texs;
+	static TextureManager* tetMgr;
 };
 
 TextureManager::TextureManager()
@@ -70,4 +78,5 @@ void TextureManager::removeTexture(unsigned int texId)
 	}
 }
 
+TextureManager* TextureManager::tetMgr = nullptr;
 #endif

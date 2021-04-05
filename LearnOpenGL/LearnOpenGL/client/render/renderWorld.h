@@ -7,20 +7,28 @@
 class RenderWorld
 {
 public:
-	RenderWorld();
+	static RenderWorld* instance()
+	{
+		if (!rw)
+			rw = new RenderWorld();
+		return rw;
+	}
 	~RenderWorld();
+	void operator=(const RenderWorld &) = delete;
 
 	inline void regRenderObject(const std::string &regId, std::shared_ptr<RenderObject> obj) { renderVec[regId] = obj; }
 	inline void removeRenderObject(const std::string &regId) { renderVec.erase(regId); }
 	void render();
 	const std::shared_ptr<Window> getWindow() const { return win; };
 private:
+	RenderWorld();
 
 public:
 
 private:
 	std::map<std::string, std::shared_ptr<RenderObject>> renderVec;
 	std::shared_ptr<Window> win;
+	static RenderWorld* rw;
 };
 
 RenderWorld::RenderWorld()
@@ -49,4 +57,5 @@ void RenderWorld::render()
 	win->afterRender();
 }
 
+RenderWorld* RenderWorld::rw = nullptr;
 #endif

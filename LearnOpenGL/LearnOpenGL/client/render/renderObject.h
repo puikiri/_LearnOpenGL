@@ -74,6 +74,7 @@ void RenderObject::render()
 	if (shader)
 	{
 		shader->active();
+		shader->bindTexture();
 		if (!exTransformMatName.empty())
 			shader->setMat4(exTransformMatName, exTransformlMat);
 	}
@@ -84,7 +85,10 @@ void RenderObject::render()
 		glDrawArrays(GL_TRIANGLES, verOffset, verNum);
 	glBindVertexArray(0);
 	if (shader)
+	{
+		shader->unbindTexture();
 		shader->deactive();
+	}
 }
 
 void RenderObject::afterRender()

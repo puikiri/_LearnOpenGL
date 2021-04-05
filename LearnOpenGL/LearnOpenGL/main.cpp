@@ -178,11 +178,10 @@ void scrollChange(double xoffset, double yoffset)
 }
 int main()
 {
-	RenderWorld render;
-	TextureManager texMgr;
-	render.getWindow()->RegWinKeyEnterCallBack("processInput", processInput);
-	render.getWindow()->RegWinCursorChangeCallBack("cursorChangeCb", cursorChangeCb);
-	render.getWindow()->RegWinScrollCallBack("scrollChange", scrollChange);
+	RenderWorld* render = RenderWorld::instance();
+	render->getWindow()->RegWinKeyEnterCallBack("processInput", processInput);
+	render->getWindow()->RegWinCursorChangeCallBack("cursorChangeCb", cursorChangeCb);
+	render->getWindow()->RegWinScrollCallBack("scrollChange", scrollChange);
 	// TODO RE CODE
 
 	///* 视口
@@ -216,26 +215,12 @@ int main()
 	glm::mat4 tempMat = glm::mat4(1.0f);
 	tempMat = glm::translate(tempMat, cubePositions[i]);
 	ro2->setExTransformMat(tempMat);
-	render.regRenderObject(ro2->getName(), ro2);
+	render->regRenderObject(ro2->getName(), ro2);
 	}
 
 	///* texture
-	///* open GL 是个状态机，当前bind了什么texture，就会用什么texture。shader同理，当前启用什么就用什么。
-	unsigned int texture[2];
-	texture[0] = texMgr.createTexture("../LearnOpenGL/resource/texture/texture_unhell.png");
-	texture[1] = texMgr.createTexture("../LearnOpenGL/resource/texture/texture_unhell_tag.png");
-
-	// 设置东西对应的混合
-	shader->active(); // 注意，需要先激活要设置的shader在设置，不然会不知道设置到哪里去。
-	shader->setInt("baseTexture", 0); // 注：这里的0/1对应的是下面激活的纹理单元的 GL_TEXTURE0/GL_TEXTURE1..
-	shader->setInt("mixTexture", 1); // 也就是说，这里和下面是成套成对的。
-	shader->deactive();
-	// 混合两个图在同一个纹理单元上（用在同一个fs上）
-	glActiveTexture(GL_TEXTURE0);// 在绑定纹理之前需要先激活纹理单元 
-	glBindTexture(GL_TEXTURE_2D, texture[0]);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, texture[1]);
-	glActiveTexture(0);
+	shader->setTexture(0, "baseTexture", "../LearnOpenGL/resource/texture/texture_unhell.png");
+	shader->setTexture(1, "mixTexture", "../LearnOpenGL/resource/texture/texture_unhell_tag.png");
 
 	while (checkLoop())
 	{
@@ -265,7 +250,7 @@ int main()
 		shader->setMat4("viewMat", viewMat);
 		shader->setMat4("projectionMat", projectionMat);
 
-		render.render();
+		render->render();
 	}
 	return -1;
 }

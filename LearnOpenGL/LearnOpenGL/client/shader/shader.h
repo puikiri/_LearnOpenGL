@@ -3,16 +3,19 @@
 
 #include "../../core/include.h"
 #include "../../core/file.h"
+#include "../render/textureManager.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <map>
+
 class Shader
 {
 public:
 	Shader(std::string vsPath, std::string fsPath);
-	~Shader() { glDeleteProgram(shaderId); };
+	~Shader();
 	inline unsigned int getID() const { return shaderId; }
 	inline void active() { glUseProgram(shaderId); };
 	inline void deactive() { /*glDeleteProgram(0);*/ };
@@ -23,6 +26,10 @@ public:
 	//								二参：传入矩阵数，三参：是否转置(用于系统和gl的横竖不对齐的问题)
 		glUniformMatrix4fv(glGetUniformLocation(shaderId, name.c_str()), matCount, transpose ? GL_TRUE : GL_FALSE, glm::value_ptr(value));
 	};
+	void setTexture(unsigned int activeTexNum, std::string texUniformKey, std::string texSource);
+	void delTexture(unsigned int activeTexNum);
+	void bindTexture();
+	void unbindTexture();
 private:
 	Shader() { };
 	void checkCompileShader(unsigned int shader, const char* compileName);
@@ -31,6 +38,8 @@ public:
 
 private:
 	unsigned int shaderId;
+	std::map<unsigned int, std::pair<unsigned int, std::string>> texs; // key : 纹理单元位置, value-key : texId, value-value ：shader texture uniform
+	TextureManager* texMgr;
 };
 
 Shader::Shader(std::string vsPath, std::string fsPath)
@@ -61,7 +70,15 @@ Shader::Shader(std::string vsPath, std::string fsPath)
 
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
+
+	texMgr = TextureManager::instance();
 }
+
+Shader::~Shader() {
+	texMgr = nullptr;
+	texs.clear();
+	glDeleteProgram(shaderId);
+};
 
 void Shader::checkCompileShader(unsigned int shader, const char* compileName)
 {
@@ -87,5 +104,43 @@ void Shader::checkLinkShaderProgram(unsigned int shader, const char* linkName)
 		printf("A xi ba !!!!! link shader wrong : %s \n", linkName);
 		printf(infoLog);
 	}
+}
+
+void Shader::setTexture(unsigned int activeTexNum, std::string texUniformKey, std::string texSource)
+{
+	auto temp = texs.find(activeTexNum);
+	if (temp != texs.end() && (temp->second.second == texUniformKey) && (texMgr->getTexture(temp->second.first)->getSourceDir() == texSource))
+		return;
+
+	// 设置东西对应的混合
+	active(); // 注意，需要先激活要设置的shader在设置，不然会不知道设置到哪里去。
+	auto tempTexture = texMgr->getTexture(texSource);
+	unsigned int texId = tempTexture ? tempTexture->getTextureId() : texMgr->createTexture(texSource);
+
+	setInt(texUniformKey, activeTexNum);// 注：这里的 texUniformKey 对应的是下面激活的纹理单元的 GL_TEXTURE0/GL_TEXTURE1..
+	// 混合两个图在同一个纹理单元上（用在同一个fs上）时，多次设置texs到同一shader的不同纹理单眼上。
+	texs[activeTexNum] = std::make_pair(texId, texUniformKey);
+
+	deactive();
+}
+
+void Shader::delTexture(unsigned int activeTexNum)
+{
+	texs.erase(activeTexNum);
+}
+
+void Shader::bindTexture()
+{
+	for (auto temp : texs)
+	{
+		glActiveTexture(GL_TEXTURE0 + temp.first);// 在绑定纹理之前需要先激活纹理单元 
+		glBindTexture(GL_TEXTURE_2D, temp.second.first);
+	}
+}
+
+void Shader::unbindTexture()
+{
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glActiveTexture(0);
 }
 #endif
