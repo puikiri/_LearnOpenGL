@@ -19,7 +19,6 @@ public:
 	inline void regRenderObject(const std::string &regId, std::shared_ptr<RenderObject> obj) { renderVec[regId] = obj; }
 	inline void removeRenderObject(const std::string &regId) { renderVec.erase(regId); }
 	void render();
-	const std::shared_ptr<Window> getWindow() const { return win; };
 private:
 	RenderWorld();
 
@@ -27,13 +26,13 @@ public:
 
 private:
 	std::map<std::string, std::shared_ptr<RenderObject>> renderVec;
-	std::shared_ptr<Window> win;
+	Window* win;
 	static RenderWorld* rw;
 };
 
 RenderWorld::RenderWorld()
 {
-	win = std::make_shared<Window>();
+	win = Window::instance();
 }
 
 RenderWorld::~RenderWorld()

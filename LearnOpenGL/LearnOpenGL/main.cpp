@@ -179,9 +179,10 @@ void scrollChange(double xoffset, double yoffset)
 int main()
 {
 	RenderWorld* render = RenderWorld::instance();
-	render->getWindow()->RegWinKeyEnterCallBack("processInput", processInput);
-	render->getWindow()->RegWinCursorChangeCallBack("cursorChangeCb", cursorChangeCb);
-	render->getWindow()->RegWinScrollCallBack("scrollChange", scrollChange);
+	Window* window = Window::instance();
+	window->RegWinKeyEnterCallBack("processInput", processInput);
+	window->RegWinCursorChangeCallBack("cursorChangeCb", cursorChangeCb);
+	window->RegWinScrollCallBack("scrollChange", scrollChange);
 	// TODO RE CODE
 
 	///* йс©з

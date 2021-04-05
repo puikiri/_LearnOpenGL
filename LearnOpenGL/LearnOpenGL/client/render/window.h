@@ -50,8 +50,14 @@ void onScrollChange(GLFWwindow* window, double xoffset, double yoffset)
 class Window :public virtual RenderBase
 {
 public:
-	Window();
+	static Window* instance()
+	{
+		if (!window)
+			window = new Window();
+		return window;
+	}
 	~Window();
+	void operator=(const Window &) = delete;
 
 	inline void RegWinSizeCallBack(const std::string &regId, WinSizeCallback func)
 	{
@@ -99,12 +105,14 @@ public:
 	virtual void afterRender();
 private:
 	GLFWwindow* getWin();
+	Window();
 
 	void clearSceneColor();
 public:
 
 private:
 	GLFWwindow* win;
+	static Window* window;
 };
 
 Window::Window()
@@ -164,4 +172,5 @@ void Window::afterRender()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 }
 
+Window* Window::window = nullptr;
 #endif
