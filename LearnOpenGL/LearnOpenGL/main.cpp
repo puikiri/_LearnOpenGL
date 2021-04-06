@@ -268,6 +268,7 @@ int main()
 	ao4->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 	render->regRenderObject(ao4->getName(), ao4);
 	lightBoxShader->setTexture(0, "baseTexture", "../LearnOpenGL/resource/texture/lightBox.png");
+	lightBoxShader->setTexture(1, "material.frameTex", "../LearnOpenGL/resource/texture/lightBoxFrame.png");
 	glm::mat4 ro4Trans = glm::mat4(1.0f);
 	ro4Trans = glm::translate(ro4Trans, ao4->getPosition());
 
