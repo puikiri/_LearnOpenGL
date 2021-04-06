@@ -278,6 +278,11 @@ int main()
 	lightBoxShader->setVec4("objectColor", objectColor);
 	lightBoxShader->setMat4("modelMat", modelMat);
 
+	lightBoxShader->setVec3("material.ambientStrength", glm::vec3(0.1f, 0.1f, 0.1f));
+	lightBoxShader->setVec3("material.diffuseStrength", glm::vec3(1.f, 1.f, 1.f));
+	lightBoxShader->setVec3("material.specularStrength", glm::vec3(0.5f, 0.5f, 0.5f));
+	lightBoxShader->setFloat("material.shininess", 32.0f);
+
 	while (checkLoop())
 	{
 		float timeValue = glfwGetTime();
