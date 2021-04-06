@@ -24,6 +24,7 @@ void main()
 	float b = min(max(lightColor.z, ambientStrength), 1);
 	float a = min(max(lightColor.w, ambientStrength), 1);
 	vec4 tLightColor = vec4(r, g, b, a);
+
     vec4 ambient = ambientStrength * tLightColor;
 
 	///* »·¾³¹â
@@ -36,7 +37,7 @@ void main()
 	vec3 viewDir = normalize(ViewPos - FragPos);
 	vec3 reflectDir = reflect(-lightDir, norm);
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), specularPow);
-	vec4 specular = specularStrength * spec * lightColor;
+	vec4 specular = specularStrength * spec * tLightColor;
 
     vec4 result = (ambient + diffuse + specular) * objectColor;
 

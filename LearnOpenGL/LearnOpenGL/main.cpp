@@ -291,7 +291,7 @@ int main()
 		glm::mat4 viewMat = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 		projectionMat = glm::perspective(glm::radians(fov), (float)winSizeW / (float)winSizeH, viewZNear, viewZFar);
 
-		auto color = glm::vec4(sin_timeValue + 0.1, sin_timeValue, sin_timeValue - 0.1, (sin_timeValue / 2.0f));
+		auto color = glm::vec4(cos_timeValue_2, sin_timeValue, sin_timeValue_2, (sin_timeValue / 2.0f));
 		// ao3 pos change 
 		ro3Trans = glm::mat4(1.0f);
 		auto pos = glm::vec3(2.0f * sin_timeValue_2, 2.0f * cos_timeValue_2, sin_timeValue * cos_timeValue_2);
