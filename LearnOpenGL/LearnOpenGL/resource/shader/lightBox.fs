@@ -51,11 +51,11 @@ void main()
 	float diff = max(dot(norm, lightDir), 0.0);
 	vec4 diffuse = tLightColor * diff * vec4(material.diffuseStrength, 1.0f);
 
-	///* 高光 // 好像失效了、、、
+	///* 高光
 	vec3 viewDir = normalize(ViewPos - FragPos);
 	vec3 reflectDir = reflect(-lightDir, norm);
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-	vec4 specular = tLightColor * vec4(texture(material.frameTex, TexCoord)) * vec4(material.specularStrength, 1.0f);// * spec;
+	vec4 specular = tLightColor * vec4(texture(material.frameTex, TexCoord)) * vec4(material.specularStrength, 1.0f) * spec;
 
     vec4 result = (ambient + diffuse + specular) * objectColor;
 

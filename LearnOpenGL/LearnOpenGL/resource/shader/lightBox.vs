@@ -20,6 +20,6 @@ void main()
     TexCoord = inTexCoord;
 	Normal = mat3(transpose(inverse(modelMat))) * normal; // 法向量需要 使用inverse和transpose函数自己生成法线矩阵 来特殊处理，具体百度
 	FragPos = vec3(modelMat * vec4(pos, 1.0));
-	LightPos = vec3(modelMat * vec4(lightPos, 1.0));
-	ViewPos = vec3(modelMat * vec4(viewPos, 1.0));
+	LightPos = lightPos;
+	ViewPos = viewPos;
 }
