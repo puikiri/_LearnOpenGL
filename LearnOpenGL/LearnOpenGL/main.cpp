@@ -274,6 +274,7 @@ int main()
 
 	auto lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	sunLightShader->setVec4("lightColor", lightColor);
+
 	auto objectColor = lightColor;
 	lightBoxShader->setVec4("lightColor", lightColor);
 	lightBoxShader->setVec4("objectColor", objectColor);

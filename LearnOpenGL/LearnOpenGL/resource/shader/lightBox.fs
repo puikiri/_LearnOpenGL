@@ -42,22 +42,26 @@ void main()
 
 	/// * 环境光
     vec4 ambient = tLightColor * vec4(material.ambientStrength, 1.0);
-
+	/*
+	此处的光照信息可以外面算好， 类似material一样传入
+	*/
 	///* 漫反射光
 	vec3 norm = normalize(Normal);
 	vec3 lightDir = normalize(LightPos - FragPos);
 	float diff = max(dot(norm, lightDir), 0.0);
 	vec4 diffuse = tLightColor * diff * vec4(material.diffuseStrength, 1.0f);
 
-	///* 高光
+	///* 高光 // 好像失效了、、、
 	vec3 viewDir = normalize(ViewPos - FragPos);
 	vec3 reflectDir = reflect(-lightDir, norm);
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-	vec4 specular = tLightColor * vec4(texture(material.frameTex, TexCoord)) * vec4(material.specularStrength, 1.0f) * spec;
+	vec4 specular = tLightColor * vec4(texture(material.frameTex, TexCoord)) * vec4(material.specularStrength, 1.0f);// * spec;
 
     vec4 result = (ambient + diffuse + specular) * objectColor;
 
     FragColor = texture(baseTexture, TexCoord); 
 	FragColor = FragColor * result;
+
+	//FragColor = result;
 }
 
