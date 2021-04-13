@@ -26,18 +26,17 @@ public:
 	std::string  getName() { return name; };
 	void setDrawVerNum(unsigned int num) { verNum = num; };
 	void setDrawVerOffset(unsigned int offset) { verOffset = offset; };
-	void setTransformUniformName(std::string name) { transformUniformName = name; };
-	std::string getTransformUniformName() { return transformUniformName; };
-	void setTransformMat(glm::mat4& mat) { transformlMat = mat; };
-	glm::mat4 getTransformMat() { return transformlMat; };
-	void resetTransformMat() { transformlMat = glm::mat4(1.0f); };
+
+	void setTransform(std::string name, glm::mat4 m4) { shaderTransform[name] = m4; };
+	glm::mat4 getTransform(std::string name) { return shaderTransform[name]; };
+	void resetTransforms() { shaderTransform.clear(); };
+
+	void setShaderV4(std::string name, glm::vec4 m4) { shaderV4Prop[name] = m4; };
+	glm::vec4 getShaderV4(std::string name) { return shaderV4Prop[name]; };
+	void resetShaderV4s() { shaderV4Prop.clear(); };
+
 	void setPosition(glm::vec3 pos) { position = pos; };
 	glm::vec3 getPosition() { return position; };
-	void setMuxColorUniformName(std::string name) { muxColorUniformName = name; };
-	std::string getMuxColorUniformName() { return muxColorUniformName; };
-	void setMuxColor(glm::vec4& v4) { muxColor = v4; };
-	glm::vec4 getMuxColor() { return muxColor; };
-	void resetMuxColor() { muxColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f); };
 private:
 
 public:
@@ -52,10 +51,8 @@ private:
 	unsigned int verOffset = 0;
 	std::string name;
 	glm::vec3 position;
-	std::string transformUniformName = "transform";
-	glm::mat4 transformlMat = glm::mat4(1.0f);
-	std::string muxColorUniformName = "muxColor";
-	glm::vec4 muxColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	std::map<std::string, glm::mat4> shaderTransform;
+	std::map<std::string, glm::vec4> shaderV4Prop;
 };
 
 RenderObject::RenderObject(std::shared_ptr<Shader> _shader)
@@ -85,10 +82,10 @@ void RenderObject::render()
 	{
 		shader->active();
 		shader->bindTexture();
-		if (!transformUniformName.empty())
-			shader->setMat4(transformUniformName, transformlMat);
-		if (!muxColorUniformName.empty())
-			shader->setVec4(muxColorUniformName, muxColor);
+		for(auto temp : shaderTransform)
+			shader->setMat4(temp.first, temp.second);
+		for (auto temp : shaderV4Prop)
+			shader->setVec4(temp.first, temp.second);
 	}
 	glBindVertexArray(VAO);
 	if (isEBO)
