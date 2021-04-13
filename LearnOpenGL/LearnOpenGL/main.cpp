@@ -253,29 +253,30 @@ int main()
 	ro3Trans = glm::translate(ro3Trans, ao3->getPosition());
 	ro3Trans = glm::scale(ro3Trans, glm::vec3(0.5, 0.5, 0.5));
 
+	sunLightShader->setVec4("lightColor", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
 	///* lightBox
 	std::shared_ptr<Shader> lightBoxShader = std::make_shared<Shader>("../LearnOpenGL/resource/shader/lightBox.vs", "../LearnOpenGL/resource/shader/lightBox.fs");
+	lightBoxShader->setTexture(0, "material.diffTex", "../LearnOpenGL/resource/texture/lightBox.png");
+	lightBoxShader->setTexture(1, "material.frameTex", "../LearnOpenGL/resource/texture/lightBoxFrame.png");
+	std::map<std::string, std::shared_ptr<RenderObject>> lightBoxRenderVecs;
+	for (int i = 0; i < cubeNum; i++)
+	{ 
 	std::shared_ptr<RenderObject> ao4 = std::make_shared<RenderObject>(lightBoxShader);
 	ao4->createEBORenderObject(vertices2, sizeof(vertices2), vertices1indices, sizeof(vertices1indices), 0, 3, false, 8, 0);
 	ao4->attachVertexAttribPointer(1, 3, false, 8, 3);
 	ao4->attachVertexAttribPointer(2, 2, false, 8, 6);
 	ao4->setDrawVerNum(36);
-	ao4->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+	ao4->setPosition(cubePositions[i]);
 	render->regRenderObject(ao4->getName(), ao4);
-	lightBoxShader->setTexture(0, "material.diffTex", "../LearnOpenGL/resource/texture/lightBox.png");
-	lightBoxShader->setTexture(1, "material.frameTex", "../LearnOpenGL/resource/texture/lightBoxFrame.png");
-	glm::mat4 ro4Trans = glm::mat4(1.0f);
-	ro4Trans = glm::translate(ro4Trans, ao4->getPosition());
-
-	sunLightShader->setVec4("lightColor", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
 	lightBoxShader->setMat4("modelMat", modelMat);
 	lightBoxShader->setFloat("material.shininess", 32.0f);
 	lightBoxShader->setVec4("light.ambient", glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
 	lightBoxShader->setVec4("light.diffuse", glm::vec4(1.f, 1.f, 1.f, 1.0f));
 	lightBoxShader->setVec4("light.specular", glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
-
+	lightBoxRenderVecs[ao4->getName()] = ao4;
+	}
 	while (checkLoop())
 	{
 		float timeValue = glfwGetTime();
@@ -300,11 +301,16 @@ int main()
 		ao3->setTransform("transform", ro3Transform);
 		sunLightShader->setVec4("lightColor", color);
 
+		for (auto temp : lightBoxRenderVecs)
+		{
+		glm::mat4 ro4Trans = glm::mat4(1.0f);
+		ro4Trans = glm::translate(ro4Trans, temp.second->getPosition());
 		auto ro4Transform = projectionMat * viewMat * modelMat * ro4Trans;
-		ao4->setTransform("transform", ro4Transform);
+		temp.second->setTransform("transform", ro4Transform);
 		lightBoxShader->setVec3("light.lightPos", ao3->getPosition());
 		lightBoxShader->setVec3("viewPos", cameraPos);
 		lightBoxShader->setVec4("light.diffuse", color);
+		}
 		/*
 		for (auto ro : boxRenderVecs)
 		{
