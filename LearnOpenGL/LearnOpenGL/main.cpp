@@ -268,18 +268,17 @@ int main()
 	glm::mat4 ro4Trans = glm::mat4(1.0f);
 	ro4Trans = glm::translate(ro4Trans, ao4->getPosition());
 
-	auto lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	sunLightShader->setVec4("lightColor", lightColor);
+	sunLightShader->setVec4("lightColor", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
-	auto objectColor = lightColor;
-	lightBoxShader->setVec4("lightColor", lightColor);
-	lightBoxShader->setVec4("objectColor", objectColor);
 	lightBoxShader->setMat4("modelMat", modelMat);
-
-	lightBoxShader->setVec3("material.ambientStrength", glm::vec3(0.1f, 0.1f, 0.1f));
-	lightBoxShader->setVec3("material.diffuseStrength", glm::vec3(1.f, 1.f, 1.f));
-	lightBoxShader->setVec3("material.specularStrength", glm::vec3(0.5f, 0.5f, 0.5f));
+	lightBoxShader->setVec4("material.ambient", glm::vec4(0.1f, 0.1f, 0.1f,1.0f));
+	lightBoxShader->setVec4("material.diffuse", glm::vec4(1.f, 1.f, 1.f, 1.0f));
+	lightBoxShader->setVec4("material.specular", glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
 	lightBoxShader->setFloat("material.shininess", 32.0f);
+
+	lightBoxShader->setVec4("light.ambient", glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
+	lightBoxShader->setVec4("light.diffuse", glm::vec4(1.f, 1.f, 1.f, 1.0f));
+	lightBoxShader->setVec4("light.specular", glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
 
 	while (checkLoop())
 	{
@@ -303,13 +302,13 @@ int main()
 		ro3Trans = glm::scale(ro3Trans, glm::vec3(0.5, 0.5, 0.5));
 		auto ro3Transform = projectionMat * viewMat * modelMat * ro3Trans;
 		ao3->setTransform("transform", ro3Transform);
-		sunLightShader->setVec4("lightColor", color);
+		//sunLightShader->setVec4("lightColor", color);
 
 		auto ro4Transform = projectionMat * viewMat * modelMat * ro4Trans;
 		ao4->setTransform("transform", ro4Transform);
-		lightBoxShader->setVec3("lightPos", ao3->getPosition());
-		lightBoxShader->setVec4("lightColor", color);
+		lightBoxShader->setVec3("light.lightPos", ao3->getPosition());
 		lightBoxShader->setVec3("viewPos", cameraPos);
+		//lightBoxShader->setVec4("light.diffuse", color);
 
 		for (auto ro : boxRenderVecs)
 		{
