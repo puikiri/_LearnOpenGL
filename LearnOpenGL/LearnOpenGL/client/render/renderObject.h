@@ -35,6 +35,10 @@ public:
 	glm::vec4 getShaderV4(std::string name) { return shaderV4Prop[name]; };
 	void resetShaderV4s() { shaderV4Prop.clear(); };
 
+	void setShaderV3(std::string name, glm::vec3 m4) { shaderV3Prop[name] = m4; };
+	glm::vec3 getShaderV3(std::string name) { return shaderV3Prop[name]; };
+	void resetShaderV3s() { shaderV3Prop.clear(); };
+
 	void setPosition(glm::vec3 pos) { position = pos; };
 	glm::vec3 getPosition() { return position; };
 private:
@@ -53,6 +57,7 @@ private:
 	glm::vec3 position;
 	std::map<std::string, glm::mat4> shaderTransform;
 	std::map<std::string, glm::vec4> shaderV4Prop;
+	std::map<std::string, glm::vec3> shaderV3Prop;
 };
 
 RenderObject::RenderObject(std::shared_ptr<Shader> _shader)
@@ -86,6 +91,8 @@ void RenderObject::render()
 			shader->setMat4(temp.first, temp.second);
 		for (auto temp : shaderV4Prop)
 			shader->setVec4(temp.first, temp.second);
+		for (auto temp : shaderV3Prop)
+			shader->setVec3(temp.first, temp.second);
 	}
 	glBindVertexArray(VAO);
 	if (isEBO)

@@ -17,11 +17,18 @@ struct Material { // 材质
 }; 
 
 struct Light {
-	vec3 lightPos;
-
+	// 光的属性，见楼上
     vec4 ambient;
     vec4 diffuse;
     vec4 specular;
+
+	// 定向光
+    vec3 direction; 
+	// 点光
+	vec3 lightPos;
+    float constant;
+    float linear;
+    float quadratic;
 };
 
 uniform Material material;
@@ -29,12 +36,17 @@ uniform Light light;
 
 void main()
 {
+	// 点光的衰减计算
+	float distance  = length(light.lightPos - FragPos);
+	float attenuation = 1.0 / (light.constant + light.linear * distance +  light.quadratic * (distance * distance));
+
 	// Phong // 模拟环境光照
 	/// * 环境光
     vec4 ambient = vec4(texture(material.diffTex, TexCoord)) * light.ambient;
 	///* 漫反射光
 	vec3 norm = normalize(Normal);
-	vec3 lightDir = normalize(light.lightPos - FragPos);
+	vec3 lightDir = normalize(light.lightPos - FragPos); // 点光
+	//vec3 lightDir = normalize(-light.direction); // 平行光
 	float diff = max(dot(norm, lightDir), 0.0);
 	vec4 diffuse = vec4(texture(material.diffTex, TexCoord)) * light.diffuse * diff;
 
@@ -44,6 +56,6 @@ void main()
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
 	vec4 specular = light.specular * vec4(texture(material.frameTex, TexCoord)) * spec;
 
-	FragColor = ambient + diffuse + specular;
+	FragColor = attenuation * (ambient + diffuse + specular);
 }
 

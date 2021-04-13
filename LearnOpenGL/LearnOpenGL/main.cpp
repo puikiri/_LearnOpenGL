@@ -195,9 +195,11 @@ int main()
 	cubePositions.emplace_back(glm::vec3(0.0f, 4.0f, 0.0f));
 	cubePositions.emplace_back(glm::vec3(0.0f, -4.0f, 0.0f));
 	cubePositions.emplace_back(glm::vec3(2.0f, 0.0f, 0.0f));
-	cubePositions.emplace_back(glm::vec3(4.0f, 0.0f, 0.0f));
+	cubePositions.emplace_back(glm::vec3(8.0f, 0.0f, 0.0f));
+	cubePositions.emplace_back(glm::vec3(16.0f, 0.0f, 0.0f));
 	cubePositions.emplace_back(glm::vec3(-2.0f, 0.0f, 0.0f));
-	cubePositions.emplace_back(glm::vec3(-4.0f, 0.0f, 0.0f));
+	cubePositions.emplace_back(glm::vec3(-8.0f, 0.0f, 0.0f));
+	cubePositions.emplace_back(glm::vec3(-16.0f, 0.0f, 0.0f));
 	int cubeNum = cubePositions.size();
 
 	RenderWorld* render = RenderWorld::instance();
@@ -260,6 +262,7 @@ int main()
 	lightBoxShader->setTexture(0, "material.diffTex", "../LearnOpenGL/resource/texture/lightBox.png");
 	lightBoxShader->setTexture(1, "material.frameTex", "../LearnOpenGL/resource/texture/lightBoxFrame.png");
 	std::map<std::string, std::shared_ptr<RenderObject>> lightBoxRenderVecs;
+	std::map<std::string, glm::mat4> lightBoxModelMatVecs;
 	for (int i = 0; i < cubeNum; i++)
 	{ 
 	std::shared_ptr<RenderObject> ao4 = std::make_shared<RenderObject>(lightBoxShader);
@@ -275,7 +278,15 @@ int main()
 	lightBoxShader->setVec4("light.ambient", glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
 	lightBoxShader->setVec4("light.diffuse", glm::vec4(1.f, 1.f, 1.f, 1.0f));
 	lightBoxShader->setVec4("light.specular", glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
+
+	lightBoxShader->setVec3("light.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
+
+	lightBoxShader->setFloat("light.constant", 1.0f);
+	lightBoxShader->setFloat("light.linear", 0.09f);
+	lightBoxShader->setFloat("light.quadratic", 0.032f);
+
 	lightBoxRenderVecs[ao4->getName()] = ao4;
+	lightBoxModelMatVecs[ao4->getName()] = modelMat;
 	}
 	while (checkLoop())
 	{
@@ -292,36 +303,37 @@ int main()
 
 		auto color = glm::vec4(cos_timeValue_2, sin_timeValue, sin_timeValue_2, (sin_timeValue / 2.0f));
 		// ao3 pos change 
-		ro3Trans = glm::mat4(1.0f);
+		ro3Trans = modelMat;
 		auto pos = glm::vec3(2.0f * sin_timeValue_2, 2.0f * cos_timeValue_2, sin_timeValue * cos_timeValue_2);
 		ao3->setPosition(pos);
 		ro3Trans = glm::translate(ro3Trans, ao3->getPosition());
 		ro3Trans = glm::scale(ro3Trans, glm::vec3(0.5, 0.5, 0.5));
-		auto ro3Transform = projectionMat * viewMat * modelMat * ro3Trans;
+		auto ro3Transform = projectionMat * viewMat * ro3Trans;
 		ao3->setTransform("transform", ro3Transform);
 		sunLightShader->setVec4("lightColor", color);
 
 		for (auto temp : lightBoxRenderVecs)
 		{
-		glm::mat4 ro4Trans = glm::mat4(1.0f);
+		glm::mat4 ro4Trans = lightBoxModelMatVecs[temp.second->getName()];
 		ro4Trans = glm::translate(ro4Trans, temp.second->getPosition());
-		auto ro4Transform = projectionMat * viewMat * modelMat * ro4Trans;
-		temp.second->setTransform("transform", ro4Transform);
-		lightBoxShader->setVec3("light.lightPos", ao3->getPosition());
-		lightBoxShader->setVec3("viewPos", cameraPos);
-		lightBoxShader->setVec4("light.diffuse", color);
+		ro4Trans = glm::rotate(ro4Trans, timeValue, glm::vec3(1.0, 1.0, 1.0));
+		temp.second->setTransform("transform", projectionMat * viewMat * ro4Trans);
+		temp.second->setTransform("modelMat", ro4Trans);
+		temp.second->setShaderV3("light.lightPos", ao3->getPosition());
+		temp.second->setShaderV3("viewPos", cameraPos);
+		temp.second->setShaderV4("light.diffuse", color);
 		}
 		/*
 		for (auto ro : boxRenderVecs)
 		{
-			glm::mat4 trans = glm::mat4(1.0f);
+			glm::mat4 trans = modelMat;
 			//trans = glm::translate(trans, ro.second->getPosition()); // 变换的前后顺序是有影响的。从下到上矩阵相乘。
 			trans = glm::rotate(trans, timeValue, glm::vec3(1.0, 1.0, 1.0));
 			trans = glm::scale(trans, glm::vec3(sin_timeValue_2, sin_timeValue_2, sin_timeValue_2));
 			auto roPos = ro.second->getPosition();
 			trans = glm::translate(trans, roPos);
 
-			auto transform = projectionMat * viewMat * modelMat * trans;
+			auto transform = projectionMat * viewMat * trans;
 			ro.second->setTransform("transform", transform);
 
 			auto color = glm::vec4(sin_timeValue + 0.1 + roPos.x / 10, sin_timeValue + roPos.y / 10, sin_timeValue - 0.1 + roPos.z / 10, (sin_timeValue / 2.0f));
