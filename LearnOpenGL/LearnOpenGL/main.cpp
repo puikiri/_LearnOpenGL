@@ -259,8 +259,10 @@ int main()
 
 	///* lightBox
 	std::shared_ptr<Shader> lightBoxShader = std::make_shared<Shader>("../LearnOpenGL/resource/shader/lightBox.vs", "../LearnOpenGL/resource/shader/lightBox.fs");
+	lightBoxShader->setMat4("modelMat", modelMat);
 	lightBoxShader->setTexture(0, "material.diffTex", "../LearnOpenGL/resource/texture/lightBox.png");
 	lightBoxShader->setTexture(1, "material.frameTex", "../LearnOpenGL/resource/texture/lightBoxFrame.png");
+	lightBoxShader->setFloat("material.shininess", 32.0f);
 	std::map<std::string, std::shared_ptr<RenderObject>> lightBoxRenderVecs;
 	std::map<std::string, glm::mat4> lightBoxModelMatVecs;
 	for (int i = 0; i < cubeNum; i++)
@@ -273,21 +275,29 @@ int main()
 	ao4->setPosition(cubePositions[i]);
 	render->regRenderObject(ao4->getName(), ao4);
 
-	lightBoxShader->setMat4("modelMat", modelMat);
-	lightBoxShader->setFloat("material.shininess", 32.0f);
-	lightBoxShader->setVec4("light.ambient", glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
-	lightBoxShader->setVec4("light.diffuse", glm::vec4(1.f, 1.f, 1.f, 1.0f));
-	lightBoxShader->setVec4("light.specular", glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
-
-	lightBoxShader->setVec3("light.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
-
-	lightBoxShader->setFloat("light.constant", 1.0f);
-	lightBoxShader->setFloat("light.linear", 0.09f);
-	lightBoxShader->setFloat("light.quadratic", 0.032f);
-
 	lightBoxRenderVecs[ao4->getName()] = ao4;
 	lightBoxModelMatVecs[ao4->getName()] = modelMat;
 	}
+
+	lightBoxShader->setVec4("dirLight.ambient", glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
+	lightBoxShader->setVec4("dirLight.diffuse", glm::vec4(1.f, 1.f, 1.f, 1.0f));
+	lightBoxShader->setVec4("dirLight.specular", glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
+	lightBoxShader->setVec4("pointLight.ambient", glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
+	lightBoxShader->setVec4("pointLight.diffuse", glm::vec4(1.f, 1.f, 1.f, 1.0f));
+	lightBoxShader->setVec4("pointLight.specular", glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
+	lightBoxShader->setVec4("spotLight.ambient", glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
+	lightBoxShader->setVec4("spotLight.diffuse", glm::vec4(1.f, 1.f, 1.f, 1.0f));
+	lightBoxShader->setVec4("spotLight.specular", glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
+
+	lightBoxShader->setVec3("dirLight.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
+
+	lightBoxShader->setFloat("pointLight.constant", 1.0f);
+	lightBoxShader->setFloat("pointLight.linear", 0.09f);
+	lightBoxShader->setFloat("pointLight.quadratic", 0.032f);
+
+	lightBoxShader->setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
+	lightBoxShader->setFloat("spotLight.outerCutOff", glm::cos(glm::radians(17.5f)));
+
 	while (checkLoop())
 	{
 		float timeValue = glfwGetTime();
@@ -319,16 +329,16 @@ int main()
 		ro4Trans = glm::rotate(ro4Trans, timeValue, glm::vec3(1.0, 1.0, 1.0));
 		temp.second->setTransform("transform", projectionMat * viewMat * ro4Trans);
 		temp.second->setTransform("modelMat", ro4Trans);
-		temp.second->setShaderV3("light.lightPos", ao3->getPosition());
 		temp.second->setShaderV3("viewPos", cameraPos);
-		temp.second->setShaderV4("light.diffuse", color);
 
-		// พÛนโ
-		temp.second->setShaderV3("light.cameralightPos", cameraPos);
-		temp.second->setShaderV3("light.cameraDirection", cameraFront);
-		temp.second->setShaderFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
-		temp.second->setShaderFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
+		temp.second->setShaderV4("dirLight.diffuse", color);
 
+		temp.second->setShaderV4("pointLight.diffuse", color);
+		temp.second->setShaderV3("pointLight.lightPos", ao3->getPosition());
+
+		temp.second->setShaderV4("spotLight.diffuse", color);
+		temp.second->setShaderV3("spotLight.position", cameraPos);
+		temp.second->setShaderV3("spotLight.direction", cameraFront);
 		}
 		/*
 		for (auto ro : boxRenderVecs)
