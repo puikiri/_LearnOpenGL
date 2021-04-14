@@ -29,6 +29,11 @@ struct Light {
     float constant;
     float linear;
     float quadratic;
+	// 聚光
+	vec3 cameralightPos;
+    vec3 cameraDirection;
+    float cutOff;
+	float outerCutOff;
 };
 
 uniform Material material;
@@ -40,21 +45,28 @@ void main()
 	float distance  = length(light.lightPos - FragPos);
 	float attenuation = 1.0 / (light.constant + light.linear * distance +  light.quadratic * (distance * distance));
 
+	// 聚光的计算
+	vec3 clightDir = normalize(light.cameralightPos - FragPos);
+	float theta = dot(clightDir, normalize(-light.cameraDirection)); 
+	// 聚光外圈柔滑
+	float epsilon   = light.cutOff - light.outerCutOff;
+	float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0); 
+	
 	// Phong // 模拟环境光照
 	/// * 环境光
     vec4 ambient = vec4(texture(material.diffTex, TexCoord)) * light.ambient;
 	///* 漫反射光
 	vec3 norm = normalize(Normal);
 	vec3 lightDir = normalize(light.lightPos - FragPos); // 点光
-	//vec3 lightDir = normalize(-light.direction); // 平行光
+	//vec3 lightDir = normalize(-light.direction); // 平行光/定向光
 	float diff = max(dot(norm, lightDir), 0.0);
-	vec4 diffuse = vec4(texture(material.diffTex, TexCoord)) * light.diffuse * diff;
+	vec4 diffuse = vec4(texture(material.diffTex, TexCoord)) * light.diffuse * diff * intensity;
 
 	///* 高光
 	vec3 viewDir = normalize(viewPos - FragPos);
 	vec3 reflectDir = reflect(-lightDir, norm);
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-	vec4 specular = light.specular * vec4(texture(material.frameTex, TexCoord)) * spec;
+	vec4 specular = light.specular * vec4(texture(material.frameTex, TexCoord)) * spec * intensity;
 
 	FragColor = attenuation * (ambient + diffuse + specular);
 }

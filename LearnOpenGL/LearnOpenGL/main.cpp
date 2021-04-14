@@ -322,6 +322,13 @@ int main()
 		temp.second->setShaderV3("light.lightPos", ao3->getPosition());
 		temp.second->setShaderV3("viewPos", cameraPos);
 		temp.second->setShaderV4("light.diffuse", color);
+
+		// พÛนโ
+		temp.second->setShaderV3("light.cameralightPos", cameraPos);
+		temp.second->setShaderV3("light.cameraDirection", cameraFront);
+		temp.second->setShaderFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
+		temp.second->setShaderFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
+
 		}
 		/*
 		for (auto ro : boxRenderVecs)

@@ -39,6 +39,10 @@ public:
 	glm::vec3 getShaderV3(std::string name) { return shaderV3Prop[name]; };
 	void resetShaderV3s() { shaderV3Prop.clear(); };
 
+	void setShaderFloat(std::string name, float m4) { shaderFloatProp[name] = m4; };
+	float getShaderFloat(std::string name) { return shaderFloatProp[name]; };
+	void resetShaderFloats() { shaderFloatProp.clear(); };
+
 	void setPosition(glm::vec3 pos) { position = pos; };
 	glm::vec3 getPosition() { return position; };
 private:
@@ -58,6 +62,7 @@ private:
 	std::map<std::string, glm::mat4> shaderTransform;
 	std::map<std::string, glm::vec4> shaderV4Prop;
 	std::map<std::string, glm::vec3> shaderV3Prop;
+	std::map<std::string, float> shaderFloatProp;
 };
 
 RenderObject::RenderObject(std::shared_ptr<Shader> _shader)
@@ -93,6 +98,8 @@ void RenderObject::render()
 			shader->setVec4(temp.first, temp.second);
 		for (auto temp : shaderV3Prop)
 			shader->setVec3(temp.first, temp.second);
+		for (auto temp : shaderFloatProp)
+			shader->setFloat(temp.first, temp.second);
 	}
 	glBindVertexArray(VAO);
 	if (isEBO)
